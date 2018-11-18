@@ -69,51 +69,50 @@ export default {
       email: "",
       password: "",
       username: "",
-      loginError: "",
-
-      methods: {
-        login() {
-          FirebaseAuth.signInWithEmailAndPassword(
+      loginError: ""
+    };
+  },
+  methods: {
+    login() {
+      FirebaseAuth.signInWithEmailAndPassword(this.email, this.password).catch(
+        error => {
+          this.loginError = error.message;
+        }
+      );
+    },
+    signup() {
+      this.$validator.validateAll().then(result => {
+        if (result) {
+          FirebaseAuth.createUserWithEmailAndPassword(
             this.email,
             this.password
-          ).catch(error => {
-            this.loginError = error.message;
-          });
-        },
-        signup() {
-          this.$validator.validateAll().then(result => {
-            if (result) {
-              FirebaseAuth.createUserWithEmailAndPassword(
-                this.email,
-                this.password
-              ).then(data => {
-                FirebaseDb.ref("users" + data.users.uid).set({
-                  name: this.username
-                });
-              });
-            }
-          });
-        },
-        created() {
-          FirebaseAuth.onAuthStateChanged(user => {
-            if (user) {
-              this.$store.commit("SET_LOGGEDIN", {
-                uid: user.uid,
-                email: user.email
-              });
-
-              FirebaseDb.ref("users" + user.uid)
-                .once("value")
-                .then(data => {
-                  this.$store.commit("SET_USERNAME", data.val().name);
-                });
-
-              this.$router.push("/chat");
-            }
+          ).then(data => {
+            console.log(data);
+            FirebaseDb.ref("users" + data.users.uid).set({
+              name: this.username
+            });
           });
         }
-      }
-    };
+      });
+    },
+    created() {
+      FirebaseAuth.onAuthStateChanged(user => {
+        if (user) {
+          this.$store.commit("SET_LOGGEDIN", {
+            uid: user.uid,
+            email: user.email
+          });
+
+          FirebaseDb.ref("users" + user.uid)
+            .once("value")
+            .then(data => {
+              this.$store.commit("SET_USERNAME", data.val().name);
+            });
+
+          this.$router.push("/chat");
+        }
+      });
+    }
   }
 };
 </script>
