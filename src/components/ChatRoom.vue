@@ -45,7 +45,10 @@ export default {
       chatMessage: ""
     };
   },
-
+  computed: {
+    username () { this.$store.state.username},
+    uid () { this.$store.state.uid},  
+  }
   methods: {}
 };
 </script>
