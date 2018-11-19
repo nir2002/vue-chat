@@ -36,8 +36,16 @@ export default {
     }
   },
   data() {
-    return {};
+    return {
+      messages: [],
+      activeRoom: {
+        name: "General",
+        slug: "general"
+      },
+      chatMessage: ""
+    };
   },
+
   methods: {}
 };
 </script>
