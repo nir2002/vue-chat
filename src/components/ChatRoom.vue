@@ -11,6 +11,17 @@
           </div>
       </div>
     </div>
+<div class="chat-actions">
+  <form @submit.prevent="sendMessage">
+    <div class="field has-addons">
+        <p class="control is-expanded">
+          <input type="text" v-model="chatMessage" placeholder="Your message" class="input">
+        </p>
+        <button type="submit" class="button"><fa-icon icon="location-arrow"/></button>
+      </div>
+    </form>
+
+</div>
 </div>
 </template>
 
@@ -26,4 +37,31 @@ export default {
 </script>
 
 <style>
+.chat-window {
+  height: calc(100vh - 132px);
+}
+.chat-history {
+  max-height: 100%;
+  overflow-y: auto;
+}
+.chat-message {
+  margin-bottom: 1em;
+}
+
+/* * is all children */
+.chat-message-meta,
+.chat-message-meta * {
+  float: left;
+}
+
+.timesstamp {
+  margin-right: 0.5em;
+  color: #999;
+  font-size: 80%;
+}
+
+.user-name {
+  font-weight: bold;
+  margin-right: 1em;
+}
 </style>
