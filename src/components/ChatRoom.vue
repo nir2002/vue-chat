@@ -26,9 +26,15 @@
 </template>
 
 <script>
-// import { FirebaseDb, FirebaseAuth } from "@/library/Database";
+import { FirebaseDb } from "@/library/Database";
+import moment from "moment";
 
 export default {
+  filters: {
+    time(timesstamp) {
+      return moment.unix(timestamp).format("DD.MM.YYYY HH:mm:ss");
+    }
+  },
   data() {
     return {};
   },
