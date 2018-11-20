@@ -5,7 +5,7 @@
           <div class="chat-message" v-for="(message, i) in messages" v-bind:key="i">
             <div class="chat-message-meta">
               <p class="timestamp">{{ message.timestamp | time}} </p>
-              <p class="timestamp">{{ message.name}}</p>
+              <p class="user-name">{{ message.name}}</p>
             </div>
             <p>{{ message.message }}</p>
           </div>
@@ -17,7 +17,7 @@
         <p class="control is-expanded">
           <input type="text" v-model="chatMessage" placeholder="Your message" class="input">
         </p>
-        <button type="submit" class="button"><fa-icon icon="location-arrow"/></button>
+        <button type="submit" class="button">Send</button>
       </div>
     </form>
 
@@ -31,7 +31,7 @@ import moment from "moment";
 
 export default {
   filters: {
-    time(timesstamp) {
+    time(timestamp) {
       return moment.unix(timestamp).format("DD.MM.YYYY HH:mm:ss");
     }
   },
@@ -46,10 +46,37 @@ export default {
     };
   },
   computed: {
-    username () { this.$store.state.username},
-    uid () { this.$store.state.uid},  
+    username() {
+      return this.$store.state.username;
+    },
+    uid() {
+      return this.$store.state.uid;
+    }
+  },
+  methods: {
+    sendMessage() {
+      FirebaseDb.ref("messages/" + this.activeRoom.slug).push({
+        userId: this.uid,
+        name: this.username,
+        message: this.chatMessage,
+        timestamp: moment().unix()
+      });
+
+      this.chatMessage = "";
+    },
+
+    initalizeRoom() {
+      FirebaseDb.ref("messages/" + this.activeRoom.slug).on(
+        "child_added",
+        data => {
+          this.messages.push(data.val());
+        }
+      );
+    }
+  },
+  created() {
+    this.initalizeRoom();
   }
-  methods: {}
 };
 </script>
 
