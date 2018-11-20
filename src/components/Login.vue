@@ -16,7 +16,7 @@
               <input class="input" type="password" placeholder="Your Password" v-model="password">
             </div>
           </div>
-          <p class="help is-danger" v-if="login-error">{{ loginError }}</p>
+          <p class="help is-danger" v-if="loginError">{{ loginError }}</p>
           <button type="submit" class="button is-block is-info is-fullwidth">Login</button>
         </form>
       </div>
