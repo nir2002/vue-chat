@@ -30,7 +30,7 @@ router.beforeEach((to, _from, next) => {
     next({
       path: '/'
     })
-  } else if (auth.currentUser !== nul & to.path === '/') {
+  } else if (auth.currentUser !== null && to.path === '/') {
     next({
       path: '/chat'
     })
