@@ -17,6 +17,10 @@ let router = new Router({
     {
       path: '/chat',
       component: ChatRoom
+    },
+    {
+      path: '/chat/:slug',
+      component: ChatRoom
     }
   ]
 })
