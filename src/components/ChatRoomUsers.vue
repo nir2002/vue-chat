@@ -1,0 +1,103 @@
+<template>
+  
+</template>
+
+<script>
+import { FirebaseDb } from "@/library/Database";
+export default {
+  props: {
+    activeRooms: {
+      type: Object,
+      required: true
+    }
+  },
+  data() {
+    return {
+      users: []
+    };
+  },
+  computed: {
+    username() {
+      return this.$store.state.username;
+    },
+    uid() {
+      return this.$store.state.uid;
+    }
+  },
+  watch: {
+    activeRoom(room, oldRoom) {
+      this.changeRoom(room, oldRoom);
+    }
+  },
+  methods: {
+    changeRoom(room, oldRoom = null) {
+      this.users = [];
+
+      if (oldRoom.slug !== undefined) {
+        // removing old room from the list
+        FirebaseDb.ref("users_rooms")
+          .child(oldRoom.slug)
+          .off();
+        // removing ourself from the room
+        FirebaseDb.ref("users_rooms")
+          .child(oldRoom.slug)
+          .child(this.uid)
+          .remove();
+      }
+
+      // add ourself to the new room
+      FirebaseDb.ref("users_rooms")
+        .child(room.slug)
+        .child(this.uid)
+        .set({
+          name: this.username,
+          uid: this.uid
+        });
+
+      // removing the user from the room on disconnect event
+      FirebaseDb.ref("users_rooms")
+        .child(room.slug)
+        .child(this.uid)
+        .onDisconnect()
+        .remove();
+
+      // when user is added to the room adding it to the user list
+      FirebaseDb.ref("users_rooms")
+        .child(room.slug)
+        .on("child_added", data => {
+          this.users.push({
+            name: data.val().name,
+            uid: data.key
+          });
+        });
+
+      // when user is leaving the room
+      FirebaseDb.ref("users_rooms")
+        .child(room.slug)
+        .on("child_removed", data => {
+          this.users.splice(
+            this.users.findIndex(user => user.uid === data.key),
+            1
+          );
+
+          // if the user that has left is us so we've been kicked
+          if (data.key === this.uid) {
+            this.$emit("kicked");
+          }
+        });
+    },
+    isOwner(uid) {
+      return this.activeRoom.owner === uid;
+    },
+    kickUser(user) {
+      FirebaseDb.ref("users_rooms")
+        .child(this.activeRoom.slug)
+        .child(user.uid)
+        .remove();
+    }
+  }
+};
+</script>
+
+<style>
+</style>
