@@ -16,15 +16,21 @@ import {
   library
 } from '@fortawesome/fontawesome-svg-core'
 import {
-  faUserSecret
+  faSignOutAlt,
+  faCrown,
+  faTimesCircle,
+  faLocationArrow,
+  faPlus,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   FontAwesomeIcon
 } from '@fortawesome/vue-fontawesome'
 import VeeValidate from "vee-validate";
 
-library.add(faUserSecret)
-Vue.component('font-awesome-icon', FontAwesomeIcon)
+library.add(faSignOutAlt, faCrown,
+  faTimesCircle, faLocationArrow, faPlus)
+
+Vue.component('fa-icon', FontAwesomeIcon)
 Vue.use(VeeValidate);
 
 Vue.config.productionTip = false;
