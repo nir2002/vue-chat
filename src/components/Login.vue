@@ -87,32 +87,31 @@ export default {
             this.email,
             this.password
           ).then(data => {
-            console.log(data);
-            FirebaseDb.ref("users" + data.users.uid).set({
+            FirebaseDb.ref("users/" + data.user.uid).set({
               name: this.username
             });
           });
         }
       });
-    },
-    created() {
-      FirebaseAuth.onAuthStateChanged(user => {
-        if (user) {
-          this.$store.commit("SET_LOGGEDIN", {
-            uid: user.uid,
-            email: user.email
+    }
+  },
+  created() {
+    FirebaseAuth.onAuthStateChanged(user => {
+      if (user) {
+        this.$store.commit("SET_LOGGEDIN", {
+          uid: user.uid,
+          email: user.email
+        });
+
+        FirebaseDb.ref("users/" + user.uid)
+          .once("value")
+          .then(data => {
+            this.$store.commit("SET_USERNAME", data.val().name);
           });
 
-          FirebaseDb.ref("users" + user.uid)
-            .once("value")
-            .then(data => {
-              this.$store.commit("SET_USERNAME", data.val().name);
-            });
-
-          this.$router.push("/chat");
-        }
-      });
-    }
+        this.$router.push("/chat");
+      }
+    });
   }
 };
 </script>
