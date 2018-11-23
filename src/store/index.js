@@ -23,9 +23,9 @@ export default new Vuex.Store({
       state.email = email
     },
 
-    SET_USERNAME(state, {
+    SET_USERNAME(state,
       username
-    }) {
+    ) {
       state.username = username;
     }
 
