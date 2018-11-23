@@ -1,12 +1,27 @@
 <template>
-  
+  <aside class="menu">
+    <p class="menu-label">Online Now</p>
+    <ul class="menu-list">
+      <li v-for="user in users" v-bind:key="user.uid">
+        <p>
+          {{ user.name }}
+          <fa-icon icon="crown" v-if="isOwner(user.uid)" />
+          <span class="is-pulled-right" v-if="isOwner(uid) && uid != user.uid">
+            <a class="is-pulled-left" @click="kickUser(user)">
+              <fa-icon icon="times-circle" />
+            </a>
+          </span>
+        </p>
+      </li>
+    </ul>
+  </aside>
 </template>
 
 <script>
 import { FirebaseDb } from "@/library/Database";
 export default {
   props: {
-    activeRooms: {
+    activeRoom: {
       type: Object,
       required: true
     }
