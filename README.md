@@ -4,7 +4,7 @@
 
 A chat application implementation according to the book "Real World Projects with Vue.js" By Daniel Khalil of Packet publishing.
 
-The server side is based on Firebase.
+The server side is based on Firebase deployed in https://vue-chat-fed93.firebaseapp.com.
 
 ## Build Setup
 
