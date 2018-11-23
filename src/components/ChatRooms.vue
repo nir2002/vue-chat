@@ -8,13 +8,13 @@
   </ul>
 
   <hr>
-  <p v-if="!addingRoom"><a class="button is-primary" @click="addingRoom = true">Create New Channel</a></p>
+  <p v-if="!addingRoom"><a class="button is-primary" @click="addingRoom = true"><fa-icon icon="plus" /> Create New Channel</a></p>
   
   <form @submit.prevent="addRoom" v-if="addingRoom">
     <div class="field has-addons">
       <input type="text" class="input" placeholder="New Playlist"
       v-model="newRoomName" />
-      <p class="control"><button type="submit" class="button is-success">Add</button></p>
+      <p class="control"><button type="submit" class="button is-success"><fa-icon icon="plus" /> Add</button></p>
     </div>
   </form>
   </aside>
@@ -25,7 +25,7 @@ import { FirebaseDb } from "@/library/Database";
 export default {
   props: {
     selectedChatRoomSlug: {
-      type: string,
+      type: String,
       required: true,
       default: "general"
     }
@@ -68,7 +68,9 @@ export default {
         owner: this.uid
       };
 
-      FirebaseDb.ref("room/" + newRoom.slug).set(newRoom);
+      FirebaseDb.ref("rooms/" + newRoom.slug).set(newRoom);
+
+      this.newRoomName = "";
     },
     slugify(name) {
       return name
