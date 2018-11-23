@@ -1,35 +1,54 @@
 <template>
   <div class="section container is-fluid">
-    <div class="chat-window">
-      <div class="chat-history">
-          <div class="chat-message" v-for="(message, i) in messages" v-bind:key="i">
-            <div class="chat-message-meta">
-              <p class="timestamp">{{ message.timestamp | time}} </p>
-              <p class="user-name">{{ message.name}}</p>
-            </div>
-            <p>{{ message.message }}</p>
+    <div class="columns">
+      <div class="column is-2">
+        <rooms :selectedChatRoomSlug="selectedChatRoomSlug" @setActiveRoom="setActiveRoom" />
+      </div>
+      <div class="column is-8">
+        <div class="chat-window">
+          <div class="chat-history">
+              <div class="chat-message" v-for="(message, i) in messages" v-bind:key="i">
+                <div class="chat-message-meta">
+                  <p class="timestamp">{{ message.timestamp | time }} </p>
+                  <p class="user-name">-({{ message.name}}):</p>
+                </div>
+                <p>{{ message.message }}</p>
+              </div>
           </div>
+        </div>
+        <div class="chat-actions">
+          <form @submit.prevent="sendMessage">
+            <div class="field has-addons">
+                <p class="control is-expanded">
+                  <input type="text" v-model="chatMessage" placeholder="Your message" class="input">
+                </p>
+                <button type="submit" class="button"><fa-icon icon="location-arrow" /></button>
+              </div>
+            </form>
+        </div>
+      </div>
+      <div class="column is-2">
+        <a class="button" @click="signout">
+          <fa-icon icon="sign-out-alt" /> Sign Out</a>
+          <hr>
+          <users :activeRoom="activeRoom" @kicked="kicked" />
       </div>
     </div>
-<div class="chat-actions">
-  <form @submit.prevent="sendMessage">
-    <div class="field has-addons">
-        <p class="control is-expanded">
-          <input type="text" v-model="chatMessage" placeholder="Your message" class="input">
-        </p>
-        <button type="submit" class="button">Send</button>
-      </div>
-    </form>
-
-</div>
 </div>
 </template>
 
 <script>
-import { FirebaseDb } from "@/library/Database";
+import { FirebaseDb, FirebaseAuth } from "@/library/Database";
 import moment from "moment";
 
+import ChatRooms from "@/components/ChatRooms";
+import ChatRoomUsers from "@/components/ChatRoomUsers";
+
 export default {
+  components: {
+    rooms: ChatRooms,
+    users: ChatRoomUsers
+  },
   filters: {
     time(timestamp) {
       return moment.unix(timestamp).format("DD.MM.YYYY HH:mm:ss");
@@ -38,11 +57,9 @@ export default {
   data() {
     return {
       messages: [],
-      activeRoom: {
-        name: "General",
-        slug: "general"
-      },
-      chatMessage: ""
+      activeRoom: {},
+      chatMessage: "",
+      selectedChatRoomSlug: this.$route.params.slug
     };
   },
   computed: {
@@ -64,18 +81,39 @@ export default {
 
       this.chatMessage = "";
     },
+    signout() {
+      FirebaseAuth.signOut().then(() => {
+        this.$router.push("/");
+      });
+    },
+    setActiveRoom(room, oldRoom) {
+      this.activeRoom = room;
+      this.initalizeRoom(oldRoom);
+    },
+    initalizeRoom(oldRoom = null) {
+      this.messages = [];
 
-    initalizeRoom() {
+      if (oldRoom !== null) {
+        FirebaseDb.ref("messages/" + oldRoom.slug).off();
+      }
+
       FirebaseDb.ref("messages/" + this.activeRoom.slug).on(
         "child_added",
         data => {
           this.messages.push(data.val());
         }
       );
+    },
+    kicked() {
+      this.$router.push("/chat/general");
     }
   },
   created() {
     this.initalizeRoom();
+  },
+  beforeRouteUpdate(to, _from, next) {
+    this.selectedChatRoomSlug = to.params.slug;
+    next();
   }
 };
 </script>
